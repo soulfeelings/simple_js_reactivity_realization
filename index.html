@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body style="display: flex; flex-wrap: wrap;">
+  
+</body>
+
+<script>
+  const cache = {};
+  let obj = {value: 'WAU'}, 
+      internalValue = obj.value;
+  
+  obj = Object.defineProperty(obj, 'value', {
+    get() {
+      return internalValue;
+    },
+    set(newValue) {
+      internalValue = newValue;
+
+      // here we reinvoke all this property subscribers
+      sub.forEach(func => func());
+    }
+  });
+
+  const sub = []; 
+
+  for(let i = 0; i < 10000; i++) {
+    let element = document.createElement('h4');
+    
+    element.style.background = 'yellow';
+    element.style.margin = '5px';
+
+    element.innerText = 'Raw ' + i + ' ' + obj.value;
+    
+    // to react to changes we cached a function which will be reinvoked when value of object will be changed (23 line)
+    sub.push(() => element.innerText = 'Raw ' + i + ' ' + obj.value);
+    
+    document.body.append(element);
+
+    cache[element.tagName + i] = element;    
+  }
+</script>
+
+</html>
